@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+<title>CPI visualisation</title>
+<script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/DaliPie.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
+<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+<link href="css/chewydata.css" rel="stylesheet">
+<link href="css/statsnz.css" rel="stylesheet">
+<script type="text/javascript" charset="utf-8">
+window.onload = function () {
+	var style = {
+		weightFormat:{dp:2},
+		decFormat:{dp:1},
+		background:{fill:"#fff"},
+		dAxis:{
+			title:"Quarterly Change",
+			label:{margin:2}
+		},
+		tAxis:{
+			initBaseSelected:-4, // -4 --> start from 4 periods before the LAST period; 4 --> start from 4 periods after the FIRST period
+			disableBackwards:true,
+			slideBar:{
+				fill:"#366"
+			},
+			label:{
+				"font-weight":"normal"
+			},
+			currNotch:{
+				ring:{
+					stroke:"#366"
+ 				}
+			}
+		}
+	}, layout = {};
+	$.getJSON('data/DaliPie.json', function (data) {
+		DaliPie(data, style, layout);
+		var gladwrap = new zRectangle({
+				layout:{
+					width:$("#Raphael").width(),
+					height:$("#Raphael").height()
+				},
+				base:{
+					fill:"black",
+					opacity:0.6
+				}
+			}),
+			introText = new zHTMLTooltipBox({
+				content:
+					"<h2>About the consumers price index visualisation</h2>" +
+"<p>Explore these graphs to see the changes in the prices and relative importance of the goods and services in the CPI basket.</p>" +
+					"<p>The <strong>bar graph</strong> on the left shows quarterly percentage change. Hover over a bar for more detail, and click to select a different period.</p>" +
+					"<p>The <strong>pie chart</strong> on the right shows the percentage change between the time periods selected on the slider bar. The longer the slice, the larger the percentage increase. The wider the slice, the more important that subcategory is to the overall index (angle = CPI weight).</p>" +
+					"<p>Click on a slice to display its subcategories, or click on the white area surrounding the pie chart to go back up a level. Click the <strong>zoom out</strong> button to go back to all groups CPI.</p>" +
+					"<p>Use the <strong>slider bar</strong> to change time periods.</p>" +
+					"<p>Download data in CSV format from link at top right of webpage.</p>" +
+					"<p>All data is from Statistics New Zealand.</p>" +
+"<p>Select <strong>Help</strong> link at top right of webpage for more detailed help and information on using tablet devices.</p>",
+				layout:{
+					anchor:gladwrap.L.getPoint(0.5, 0.25),
+					width:480,
+					xAlign:"xCentre", yAlign:"yCentre"
+				},
+				base:{
+					margin:40
+// 					"text-align":"center"
+				}
+			}),
+			start = function () {
+				gladwrap.remove(500);
+				introText.remove(500);
+// 				tAxis.axisSelect(4, tAxis.Y.select.t, tAxis.Y.select.e); // You can use this to script an action
+			};
+		introText.show();
+		introText.stopMouseEvents();
+		gladwrap.click(start);
+		introText.click(start);
+	}).error(JSONerror);
+};
+</script>
+</head>
+<body>
+	<div id=menubar>
+		<ul>
+			<li><a href=http://www.stats.govt.nz><img id=logo src="css/statsnz.png"></a></li>
+			<li><input id=searchBox value=Search... onclick=this.value='' onblur=this.value='Search...'></li>
+			<li id=title> Consumers price index visualisation</li>
+			<table id=chewy>
+				<tbody>
+					<tr>
+						<!--<td id=chewylogo rowspan=2><a href=http://www.chewydata.com><img src="css/chewydata.png"></img></a></td>-->
+						<td id=powerby rowspan=1 colspan=5><a href=http://www.chewydata.com>Visualisation powered by ChewyData</a></td>
+					</tr>
+					<tr id=options>
+						<td><a href="http://www.stats.govt.nz/~/media/E285A5414F1B470C8A99015F755E6579.ashx">Download data</a></td>
+						<td>|</td>
+						<td><a href="http://www.stats.govt.nz/tools_and_services/newsletters/price-index-news/Apr -14/cpi-vis-help.aspx" target="_blank">Help</a></td>
+						<td>|</td>
+						<td><a href="http://www.stats.govt.nz/tools_and_services/newsletters/price-index-news/Apr%20-14/cpi-vis-help.aspx#cpifeedback" target="_blank">Feedback</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</ul>
+	</div>
+	<div id="Raphael"></div>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-16227605-13', 'stats.govt.nz');
+		ga('send', 'pageview');
+	</script>
+</body>
+</html>

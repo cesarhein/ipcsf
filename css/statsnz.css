@@ -1,0 +1,34 @@
+div a {
+	color:#366;
+}
+div a:hover {
+	color:#399;
+}
+
+#menubar {
+	background:#366;
+	height:43px;
+}
+
+#menubar li {
+	border:none;
+}
+
+#menubar ul {
+	padding:9px;
+}
+
+#menubar #logo {
+	padding-left:22px;
+	margin-top:-4px;
+	margin-bottom:-8px;
+}
+
+#menubar input {
+	width:280px;
+
+}
+
+#menubar #options {
+	font-weight:bold;
+}

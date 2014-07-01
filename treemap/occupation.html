@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+<title>Treemap data visualisation</title>
+<script src="../lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../lib/HotTree.js" type="text/javascript" charset="utf-8"></script>
+<script src="../lib/jquery-ui-1.10.3.custom.min.js"></script>
+<link href="../css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+<link href="../css/chewydata.css" rel="stylesheet">
+<link href="../css/statsnz.css" rel="stylesheet">
+<script type="text/javascript" charset="utf-8">
+window.onload = function () {
+	var style = {
+			customDescription:function (S, D, mode) {
+				var i, name, prevVal, currVal, prevYear, currYear, valChange, content, vals = [],
+					description = S.dc.getMeta("description", {d:0, as:S.A}),
+					children = S.dc.findChildren({d:0, as:S.A}),
+					addList = function (vals, mode) {
+						var i, text = "",
+							mod = (mode == "max") ? 1 : -1,
+							vals = za.sortObjects(vals, "valChange", mode == "max");
+						for (i = 0; i < Math.min(vals.length, 3); i++) { // Each list should have 3 items, unless there aren't enough vals
+							if (mod * vals[i].valChange <= 0) break; // If out of increasing/decreasing values, quit
+							if (i == 0) text = "<h4>Biggest <b>" + ((mode == "max") ? "increases" :"decreases") + "</b>:</h4>";
+							text +=
+								"<li>" + vals[i].name +
+								" (" + zt.format(vals[i].valChange, zo.clone(Y.valFormat, {forceSign:true})) +
+								" or " + zt.format(vals[i].decChange, zo.clone(Y.decFormat, {forceSign:true})) + ")";
+						};
+						return text;
+					};
+				if (description) content = "<p>" + description + "</p>";
+				else if (children.length) {
+					for (i = 0; i < children.length; i++) {
+						prevVal = S.swarm.getBaseVal(children[i]);
+						currVal = S.swarm.getCurrVal(children[i]);
+						vals.push({
+							name:S.dc.getName({d:0, a:children[i]}),
+							valChange:currVal - prevVal,
+							decChange:currVal / prevVal - 1
+						});
+					};
+					content = addList(vals, "min") + "<br>" + addList(vals, "max"); // Find the biggest cuts/increase among children
+				} else {
+					name = S.dc.getName({d:0, as:S.A});
+					prevYear = S.dc.getName({d:1, a:za.last(S.A[1]) - 1});
+					currYear = S.dc.getName({d:1, a:za.last(S.A[1])});
+					prevVal = S.swarm.getBaseVal(S.A[0]);
+					currVal = S.swarm.getCurrVal(S.A[0]);
+					decChange = currVal / prevVal - 1;
+					if (prevVal == null || prevVal == "") {
+						content = "This occupation category has been created after the " + prevYear + " Census so no comparison over time is available.";
+					} else {
+ 						content =
+							name + " has " + ((decChange >= 0) ? "increased" : "decreased") +
+							" by " + zt.format(decChange, Y.decFormat) +
+							", from " + zt.format(prevVal) + " in " + prevYear +
+							" to " + zt.format(currVal) + " in " + currYear + ".";
+					};
+ 					content += "<br><br>Note: This is the lowest level for this classification."
+				};
+				content += "<br><br><br><i>All figures are for the employed census usually resident population count aged 15 years and over, 2006 and 2013 Censuses.</i>"
+				return {content:content};
+			},
+			customRootName:"Occupations of employed people in New Zealand",
+			valFormat:{prefix:null, dp:1, mode:null},
+			background:{fill:"#fff"},
+			tooltipBox:{
+				fill:"#000",
+				background:{
+					fill:"#fff",
+					stroke:"#000",
+					opacity:0.8
+				}
+			},
+			tAxis:{
+				title:"Year",
+				axisTitle:{}
+			},
+			dAxis:{
+				title:"Number of people (000)",
+				label:{
+					format:{multiply:0.001}
+				},
+				axisTitle:{
+					margin:40
+				}
+			},
+			sideBar:{
+				background:{fill:"#eeeef2"},
+				chartTitle:{
+					margin:20,
+					format:{wrap:32},
+					"font-size":16,
+					"font-weight":"bold",
+					fill:"#666"
+				}
+			}
+		},
+		layout = {
+			description:{height:680}
+		};
+	$.getJSON('../data/HotTree.json', function (data) {
+		HotTree(data, style, layout);
+		var init = document.location.hash.slice(1);
+		if (init && init != SWARM.dc.getName({d:1, a:BASE_TIME}) + "." + ROOT) { // If init is a valid number and not root
+			init = init.split(".");
+			if (init[0] != BASE_TIME) SWARM.changeBaseTime(init[0]);
+			if (init[1] != ROOT) {
+				SWARM.G.delay(800, function () {
+					SWARM.unlock();
+					SWARM.zoomTo(init[1] * 1);
+				});
+			};
+		} else {
+			var gladwrap = new zRectangle({
+					layout:{
+						width:$("#Raphael").width(),
+						height:$("#Raphael").height()
+					},
+					base:{
+						fill:"black",
+						opacity:0.6
+					}
+				}),
+				introText = new zHTMLTooltipBox({
+					content:
+						"<h2>About the occupation treemap</h2>" +
+						"<p>The treemap shows the relative size of each occupation group and the sub-groups within them.</p>" +
+						"<p>The sizes of the boxes are proportional to the number of people in each group and sub-group.</p>" +
+						"<p>The colours of the boxes show the changes in the percentage of people in each group and sub-group between 2006 and 2013. The boxes are showing 2013 data.</p>" +
+						"<p>Hover over a box to see the occupation it represents, and to display the related statistics on the left.</p>" +
+						"<p>The treemap has five levels of detail. Click on a box to go down a level and see the breakdown of occupations in that box. </p>" + "<p>To go to a different level, either click on the linked text above the treemap or click outside the box. </p>" + "<p>To return to the beginning, click on the zoom out button.</p>"+
+						"<p><strong>Download data</strong> from link at top right of webpage. </p>" +
+						"<p>All data is from Statistics New Zealand.</p>" +
+						"<p>Select <strong>Help</strong> link at top right of webpage for more detailed help and information on using tablet devices.</p>",
+					layout:{
+						anchor:gladwrap.L.getPoint(0.5, 0.25),
+						width:480,
+						xAlign:"xCentre", yAlign:"yCentre"
+					},
+					base:{
+						margin:32
+					}
+				}),
+				start = function () {
+					gladwrap.remove(500);
+					introText.remove(500);
+	// 				tAxis.axisSelect(4, tAxis.Y.select.t, tAxis.Y.select.e); // You can use this to script an action
+				};
+			introText.show();
+			introText.stopMouseEvents();
+			gladwrap.click(start);
+			introText.click(start);
+		};
+	}).error(JSONerror);
+};
+</script>
+</head>
+<body>
+	<div id=menubar>
+		<ul>
+			<li><a href=http://www.stats.govt.nz><img id=logo src="../css/statsnz.png"></a></li>
+			<li><input id=searchBox value=Search... onclick=this.value='' onblur=this.value='Search...'></li>
+			<li id=title>Occupation of employed people in New Zealand treemap</li>
+			<li><a id=first href=javascript:SWARM.changeBaseTime('first') title=""></a></li>
+			<li><a id=prev href=javascript:SWARM.changeBaseTime('prev') title=""></a></li>
+			<table id=chewy>
+				<tbody>
+					<tr>
+						<!--<td id=chewylogo rowspan=2><a href=http://www.chewydata.com><img src="../css/chewydata.png"></img></a></td>-->
+						<td id=powerby rowspan=1 colspan=5><a href=http://www.chewydata.com>Visualisation powered by ChewyData</a></td>
+					</tr>
+					<tr id=options>
+						<td><a href="http://www.stats.govt.nz/~/media/B89EDAB4280E41FDB4CF9972A7BC541C.ashx">Download data</a></td>
+						<td>|</td>
+						<td><a href="http://www.stats.govt.nz/browse_for_stats/snapshots-of-nz/treemap-vis-help.aspx" target="_blank">Help</a></td>
+						<td>|</td>
+						<td><a href="http://www.stats.govt.nz/Census/2013-census/data-tables/total-by-topic.aspx" target="_blank">Feedback</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</ul>
+	</div>
+	<div id="Raphael"></div>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-16227605-13', 'stats.govt.nz');
+		ga('send', 'pageview');
+	</script>
+</body>
+</html>
