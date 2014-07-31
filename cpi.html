@@ -14,8 +14,48 @@
 <script type="text/javascript" charset="utf-8">
 window.onload = function () {
 	var style = {
-		weightFormat:{dp:2},
-		decFormat:{dp:1},
+		customTooltip:function (A, D) {
+			var S = this,
+				asPercent = function (dec) {
+					return (dec) ? zt.format(dec, S.Y.format.change) : "No change";
+				};
+			with (S.calcAll(A)) return "" +
+				"<h3>" + category + "</h3>" +
+				((A[2] > 0) ? "<b>" + asPercent(change) + "</b> in " + time : "") +
+				"<br><b>" + asPercent(baseChange) + "</b> between " + baseTime + " and " + time +
+				"<br><b>" + zt.format(baseWeight, S.Y.format.weight) + "</b> of " + baseTime + " the CPI basket" +
+				"<i>" + (
+					(D.role == "bar") ?
+						(!PAPER.isiPad) ?
+							"<p>Click to select this period" :
+							"<p>Click again to select this period" : // iPad
+					(D.role == "slice" && childrenCategory.length) ?
+						(!PAPER.isiPad) ?
+							"<p>Click to zoom in" : // If it has children, then zoom must be possible
+							"<p>Click again to zoom in" : // If it has children, then zoom must be possible
+					""
+				) + "</p></i>";
+		},
+		customDescription:function (S, D, mode) {
+			var data = S.mainSwarm.calcAll(S.dc.addSpaces(S.A, S.axes.t.selected));
+			with (data) return {content:
+				"<h2>" + category + "</h2><p>" +
+				category + (
+					(childrenCategory.length) ? " contains " + childrenCategory.length + " subcategories" :
+					" is a subcategory of " + parentCategory) +
+				" and was " + zt.format(baseWeight, S.Y.format.weight) + " of the " + baseTime + " the CPI basket.<p>" +
+				"Prices " + (
+					(!change) ? "did not change" :
+					((change < 0) ? "fell by " : "rose by ") + zt.format(change, S.Y.format.description)
+				) + " in " + time + ", " +
+				"and were " + zt.format(baseChange, S.Y.format.description) + ((baseChange < 0) ? " lower" : " higher") +
+				" than they were in " + baseTime + "."
+			};
+		},
+		format:{
+			dec:{dp:1},
+			weight:{dp:2}
+		},
 		background:{fill:"#fff"},
 		dAxis:{
 			title:"Quarterly Change",
@@ -75,6 +115,8 @@ window.onload = function () {
 				introText.remove(500);
 // 				tAxis.axisSelect(4, tAxis.Y.select.t, tAxis.Y.select.e); // You can use this to script an action
 			};
+
+
 		introText.show();
 		introText.stopMouseEvents();
 		gladwrap.click(start);
