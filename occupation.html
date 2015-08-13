@@ -3,14 +3,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9">
 <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 <title>Treemap data visualisation</title>
-<script src="../lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="../lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="../lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="../lib/HotTree.js" type="text/javascript" charset="utf-8"></script>
-<script src="../lib/jquery-ui-1.10.3.custom.min.js"></script>
-<link href="../css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
-<link href="../css/chewydata.css" rel="stylesheet">
-<link href="../css/statsnz.css" rel="stylesheet">
+<script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/HotTree.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
+<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+<link href="css/chewydata.css" rel="stylesheet">
+<link href="css/statsnz.css" rel="stylesheet">
 <script type="text/javascript" charset="utf-8">
 window.onload = function () {
 	var style = {
@@ -54,11 +54,16 @@ window.onload = function () {
 					if (prevVal == null || prevVal == "") {
 						content = "This occupation category has been created after the " + prevYear + " Census so no comparison over time is available.";
 					} else {
- 						content =
-							name + " has " + ((decChange >= 0) ? "increased" : "decreased") +
-							" by " + zt.format(decChange, Y.decFormat) +
-							", from " + zt.format(prevVal) + " in " + prevYear +
-							" to " + zt.format(currVal) + " in " + currYear + ".";
+						content =
+							"<h4>Change:</h4>" +
+							"<li>" + name +
+							" (" + zt.format(currVal - prevVal, zo.clone(Y.valFormat, {forceSign:true})) +
+							" or " + zt.format(decChange, zo.clone(Y.decFormat, {forceSign:true})) + ")";
+//  						content =
+// 							name + " has " + ((decChange >= 0) ? "increased" : "decreased") +
+// 							" by " + zt.format(decChange, Y.decFormat) +
+// 							", from " + zt.format(prevVal) + " in " + prevYear +
+// 							" to " + zt.format(currVal) + " in " + currYear + ".";
 					};
  					content += "<br><br>Note: This is the lowest level for this classification."
 				};
@@ -82,8 +87,9 @@ window.onload = function () {
 			},
 			dAxis:{
 				title:"Number of people (000)",
+				minNotchGap:100,
 				label:{
-					format:{multiply:0.001}
+					format:{multiply:0.001, dp:3}
 				},
 				axisTitle:{
 					margin:40
@@ -93,7 +99,7 @@ window.onload = function () {
 				background:{fill:"#eeeef2"},
 				chartTitle:{
 					margin:20,
-					format:{wrap:32},
+					format:{wrap:28},
 					"font-size":16,
 					"font-weight":"bold",
 					fill:"#666"
@@ -101,9 +107,10 @@ window.onload = function () {
 			}
 		},
 		layout = {
+			width:780,
 			description:{height:680}
 		};
-	$.getJSON('../data/HotTree.json', function (data) {
+	$.getJSON('data/HotTree.json', function (data) {
 		HotTree(data, style, layout);
 		var init = document.location.hash.slice(1);
 		if (init && init != SWARM.dc.getName({d:1, a:BASE_TIME}) + "." + ROOT) { // If init is a valid number and not root
@@ -163,26 +170,8 @@ window.onload = function () {
 <body>
 	<div id=menubar>
 		<ul>
-			<li><a href=http://www.stats.govt.nz><img id=logo src="../css/statsnz.png"></a></li>
 			<li><input id=searchBox value=Search... onclick=this.value='' onblur=this.value='Search...'></li>
 			<li id=title>Occupation of employed people in New Zealand treemap</li>
-			<li><a id=first href=javascript:SWARM.changeBaseTime('first') title=""></a></li>
-			<li><a id=prev href=javascript:SWARM.changeBaseTime('prev') title=""></a></li>
-			<table id=chewy>
-				<tbody>
-					<tr>
-						<!--<td id=chewylogo rowspan=2><a href=http://www.chewydata.com><img src="../css/chewydata.png"></img></a></td>-->
-						<td id=powerby rowspan=1 colspan=5><a href=http://www.chewydata.com>Visualisation powered by ChewyData</a></td>
-					</tr>
-					<tr id=options>
-						<td><a href="http://www.stats.govt.nz/~/media/B89EDAB4280E41FDB4CF9972A7BC541C.ashx">Download data</a></td>
-						<td>|</td>
-						<td><a href="http://www.stats.govt.nz/browse_for_stats/snapshots-of-nz/treemap-vis-help.aspx" target="_blank">Help</a></td>
-						<td>|</td>
-						<td><a href="http://www.stats.govt.nz/Census/2013-census/data-tables/total-by-topic.aspx" target="_blank">Feedback</a></td>
-					</tr>
-				</tbody>
-			</table>
 		</ul>
 	</div>
 	<div id="Raphael"></div>
