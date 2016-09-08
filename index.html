@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+<title>IPC - Santa Fe</title>
+<script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/DaliPie.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
+<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+<link href="css/chewydata.css" rel="stylesheet">
+<link href="css/statsnz.css" rel="stylesheet">
+<script type="text/javascript" charset="utf-8">
+window.onload = function () {
+	var style = {
+		weightFormat:{dp:2},
+		decFormat:{dp:1},
+		background:{fill:"#fff"},
+		dAxis:{
+			title:"Quarterly Change",
+			label:{margin:2}
+		},
+		tAxis:{
+			initBaseSelected:-4, // -4 --> start from 4 periods before the LAST period; 4 --> start from 4 periods after the FIRST period
+			disableBackwards:true,
+			slideBar:{
+				fill:"#366"
+			},
+			label:{
+				"font-weight":"normal"
+			},
+			currNotch:{
+				ring:{
+					stroke:"#366"
+ 				}
+			}
+		}
+	}, layout = {};
+	$.getJSON('data/DaliPie.json', function (data) {
+		DaliPie(data, style, layout);
+		var gladwrap = new zRectangle({
+				layout:{
+					width:$("#Raphael").width(),
+					height:$("#Raphael").height()
+				},
+				base:{
+					fill:"black",
+					opacity:0.6
+				}
+			}),
+			introText = new zHTMLTooltipBox({
+				content:
+					"<h2>C&oacute;mo interpretar este visualizador</h2>" +
+"<p>Descripci&oacute;n.</p>",
+				layout:{
+					anchor:gladwrap.L.getPoint(0.5, 0.25),
+					width:480,
+					xAlign:"xCentre", yAlign:"yCentre"
+				},
+				base:{
+					margin:40
+// 					"text-align":"center"
+				}
+			}),
+			start = function () {
+				gladwrap.remove(500);
+				introText.remove(500);
+// 				tAxis.axisSelect(4, tAxis.Y.select.t, tAxis.Y.select.e); // You can use this to script an action
+			};
+		introText.show();
+		introText.stopMouseEvents();
+		gladwrap.click(start);
+		introText.click(start);
+	}).error(JSONerror);
+};
+</script>
+</head>
+<body>
+	<div id="Raphael"></div>
+</body>
+</html>
