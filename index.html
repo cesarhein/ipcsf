@@ -18,7 +18,7 @@ window.onload = function () {
 		decFormat:{dp:1},
 		background:{fill:"#fff"},
 		dAxis:{
-			title:"Quarterly Change",
+			title:"Cambio Mensual",
 			label:{margin:2}
 		},
 		tAxis:{
@@ -37,7 +37,7 @@ window.onload = function () {
 			}
 		}
 	}, layout = {};
-	$.getJSON('data/DaliPie.json', function (data) {
+	$.getJSON('data/IPCRosario.json', function (data) {
 		DaliPie(data, style, layout);
 		var gladwrap = new zRectangle({
 				layout:{
@@ -51,8 +51,12 @@ window.onload = function () {
 			}),
 			introText = new zHTMLTooltipBox({
 				content:
-					"<h2>C&oacute;mo interpretar este visualizador</h2>" +
-"<p>Descripci&oacute;n.</p>",
+					"<h2>¿C&oacute;mo utilizar el visualizador?</h2>" +
+"<P> Explorar estas gr&aacute;ficas para ver los cambios en los precios y la importancia relativa de los bienes y servicios de la canasta del IPC. </P>" +
+"<P> El <strong>gr&aacute;fico de barras</strong> de la izquierda muestra cambio el porcentual por mes. Pase por encima de una barra para m&aacute;s detalle, y haga clic para seleccionar un per&iacute;odo diferente. </P>" +
+"<P> El <strong>gr&aacute;fico circular</strong> de la derecha muestra el cambio porcentual entre los per&iacute;odos de tiempo seleccionados en la barra inferior. Cuanto m&aacute;s larga sea la rodaja, tanto mayor es el porcentaje de aumento. Cuanto m&aacute;s amplia sea la divisi&oacute;n, m&aacute;s importante el la subcategor&iacute;a en el &iacute;ndice general (&aacute;ngulo = ponderaci&oacute;n en IPC). </p> "+
+"<P> Haga clic en una rebanada para mostrar sus subcategor&iacute;as, o haga clic en el &aacute;rea blanca que rodea el gr&acute;fico circular para volver a subir un nivel. Haga clic en el bot&oacute;n <strong>Alejar</strong> para volver a todos los grupos del IPC. </p> "+
+"<P> Utilice la <strong>barra deslizante</strong> para modificar los per&iacute;odos de tiempo. </P>",
 				layout:{
 					anchor:gladwrap.L.getPoint(0.5, 0.25),
 					width:480,
