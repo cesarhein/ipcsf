@@ -5,7 +5,7 @@
 <title>IPC - Santa Fe</title>
 <script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="lib/zed.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/zed.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/DaliPie.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
 <link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@ window.onload = function () {
 			label:{margin:2}
 		},
 		tAxis:{
-			initBaseSelected:-4, // -4 --> start from 4 periods before the LAST period; 4 --> start from 4 periods after the FIRST period
+			initBaseSelected:-1, // -4 --> start from 4 periods before the LAST period; 4 --> start from 4 periods after the FIRST period
 			disableBackwards:true,
 			slideBar:{
 				fill:"#366"
