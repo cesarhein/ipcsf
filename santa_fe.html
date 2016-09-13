@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=9">
 <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
-<title>IPC - Provincial</title>
+<title>IPC - Santa Fe</title>
 <script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/zed.js" type="text/javascript" charset="utf-8"></script>
@@ -37,7 +37,7 @@ window.onload = function () {
 			}
 		}
 	}, layout = {};
-	$.getJSON('data/provincial.json', function (data) {
+	$.getJSON('data/santa_fe.json', function (data) {
 		DaliPie(data, style, layout);
 		var gladwrap = new zRectangle({
 				layout:{
@@ -83,8 +83,8 @@ window.onload = function () {
 <body>
 	<div id=menubar>
 		<ul>
-			<li id=title>IPC Provincial</li>
-			<li><a id="santa_fe" href="santa_fe.html" title="IPC Santa Fe.">Aglomerado Santa Fe</a></li>
+			<li id=title>IPC Aglomerado Santa Fe</li>
+			<li><a id="provincial" href="index.html" title="IPC Provincial.">IPC Provincial</a></li>
 			<li><a id="rosario" href="rosario.html" title="IPC Santa Fe.">Aglomerado Rosario</a></li>
 		</ul>
 	</div>
